@@ -15,7 +15,11 @@ func ListUser() (users []dao.User, err error) {
 	return
 }
 
-func CreateUser() (user dao.User, err error) {
+func CreateUser(name string) (user *dao.User, err error) {
+	user = &dao.User{
+		Name: name,
+		Type: "user",
+	}
 	err = dao.Db.Insert(user)
 	if err != nil {
 		fmt.Print(err)

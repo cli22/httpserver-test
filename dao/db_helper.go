@@ -2,23 +2,25 @@ package dao
 
 import (
 	"github.com/go-pg/pg"
+	//"fmt"
 )
 
+// 改成配置文件
 var Db = pg.Connect(&pg.Options{
 	User:     "postgres",
-	Password: "",
+	Password: "123",
 	Database: "test",
 })
 
-func init() {
-	err := createSchema(Db)
-	if err != nil {
-		panic(err)
-	}
-}
+//func init() {
+//	err := createSchema(Db)
+//	if err != nil {
+//		fmt.Print(err)
+//	}
+//}
 
 func createSchema(db *pg.DB) error {
-	for _, model := range []interface{}{&srv.User{}, &srv.Relationship{}} {
+	for _, model := range []interface{}{&User{}, &Relationship{}} {
 		err := db.CreateTable(model, nil)
 		if err != nil {
 			return err
@@ -28,18 +30,18 @@ func createSchema(db *pg.DB) error {
 }
 
 type User struct {
-	Id   int64
-	Uid  int64
-	Name string
-	Type string
+	Id int64 `json:"id"`
+	//Uid  int64
+	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 type Relationship struct {
-	Id         int64
-	Uid        int64
-	AnotherUid int64
-	State      RelationshipState
-	Type       RelationshipType
+	Id         int64  `json:"-"`
+	Uid        int64  `json:"-"`
+	AnotherUid int64  `json:"user_id"`
+	State      string `json:"state"`
+	Type       string `json:"type"`
 }
 
 type RelationshipState string
@@ -49,10 +51,4 @@ const (
 	Disliked RelationshipState = "disliked"
 	Matched  RelationshipState = "matched"
 	Default  RelationshipState = ""
-)
-
-type RelationshipType string
-
-const (
-	relationship RelationshipType = "relationship"
 )
