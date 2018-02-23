@@ -2,10 +2,9 @@ package dao
 
 import (
 	"github.com/go-pg/pg"
-	//"fmt"
 )
 
-// 改成配置文件
+// todo 改成配置文件
 var Db = pg.Connect(&pg.Options{
 	User:     "postgres",
 	Password: "123",

@@ -1,16 +1,17 @@
 package controller
 
 import (
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
+
 	srv "httpserver-test/service"
 	"httpserver-test/dao"
-
-	"github.com/gorilla/mux"
-	"encoding/json"
+	"httpserver-test/error"
+	"httpserver-test/log"
 )
 
 func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,18 +19,24 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	userId := vars["user_id"]
 	i, err := strconv.Atoi(userId)
 	if err != nil {
-		fmt.Println(err)
+		log.Warning.Println("GetRelationshipHandler Atoi user_id error: ", err)
+		// todo return {"error":errorMsg}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	fmt.Println(i)
 	res, err := srv.ListUserRelationship(i)
 	if err != nil {
-		fmt.Print(err)
+		log.Warning.Println("GetRelationshipHandler ListUserRelationship error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	fmt.Print(res)
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
-		fmt.Print(err)
+		log.Warning.Println("GetRelationshipHandler Marshal error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	log.Info.Println("GetRelationshipHandler ListUserRelationship success, result: ", res)
 	// Todo interceptor
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonBytes)
@@ -40,30 +47,45 @@ func CreateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	userId := vars["user_id"]
 	uid, err := strconv.Atoi(userId)
 	if err != nil {
-		fmt.Println(err)
+		log.Warning.Println("CreateRelationshipHandler Atoi user_id error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	otherUid := vars["other_user_id"]
 	ouid, err := strconv.Atoi(otherUid)
 	if err != nil {
-		fmt.Println(err)
+		log.Warning.Println("CreateRelationshipHandler Atoi otherUid error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	// todo parameter check user_id, other_user_id
-	var state map[string]interface{}
+	var input map[string]interface{}
 	body, _ := ioutil.ReadAll(r.Body)
-	json.Unmarshal(body, &state)
-	s := state["state"].(string)
-	if s != string(dao.Liked) && s != string(dao.Disliked) {
-		fmt.Println("parameter invaild: state")
-	}
-	fmt.Println(uid, ouid, s)
-	res, err := srv.UpdateRelationship(uid, ouid, s)
+	err = json.Unmarshal(body, &input)
 	if err != nil {
-		fmt.Print(err)
+		log.Warning.Println("CreateRelationshipHandler Unmarshal input error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	fmt.Print(res)
+	state := input["state"].(string)
+	if state != string(dao.Liked) && state != string(dao.Disliked) {
+		log.Warning.Println("CreateRelationshipHandler error: ", error.ErrStateInvalid)
+		http.Error(w, error.ErrStateInvalid.Error(), http.StatusBadRequest)
+		return
+	}
+	log.Info.Println("CreateRelationshipHandler parameter", uid, ouid, state)
+	res, err := srv.UpdateRelationship(uid, ouid, state)
+	if err != nil {
+		log.Warning.Println("CreateRelationshipHandler UpdateRelationship error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Info.Println("CreateRelationshipHandler success, result: ", res)
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
-		fmt.Print(err)
+		log.Warning.Println("CreateRelationshipHandler Unmarshal result error: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	// Todo interceptor
 	w.Header().Set("Content-Type", "application/json")

@@ -1,0 +1,10 @@
+Info:2018/02/23 10:49:10 user.go:28: UserHandler ListUser success, result:  [{9 Alice user} {10 Tom user} {11 Alice user} {12 Tom user} {13 Alice user} {14 Tom user} {15 Alice user} {16 Tom user} {17 Alice user} {18 Alice user} {19 Tom user} {20 Alice user} {21 Tom user}]
+Info:2018/02/23 10:50:47 user.go:28: UserHandler ListUser success, result:  [{9 Alice user} {10 Tom user} {11 Alice user} {12 Tom user} {13 Alice user} {14 Tom user} {15 Alice user} {16 Tom user} {17 Alice user} {18 Alice user} {19 Tom user} {20 Alice user} {21 Tom user}]
+Info:2018/02/23 10:50:56 user.go:56: UserHandler CreateUser success, result:  &{22 Alice user}
+Info:2018/02/23 10:51:05 relationship.go:15: ListUserRelationship SELECT success, result relationships:  [{1 1 2 matched relationship} {3 1 3 liked relationship}]
+Info:2018/02/23 10:51:05 relationship.go:38: GetRelationshipHandler ListUserRelationship success, result:  [{1 1 2 matched relationship} {3 1 3 liked relationship}]
+Warning:2018/02/23 10:51:24 user.go:40: UserHandler error:  参数错误，用户名不能为空
+Info:2018/02/23 10:52:27 relationship.go:75: CreateRelationshipHandler parameter 1 2 liked
+Info:2018/02/23 10:52:27 relationship.go:35: UpdateRelationship SELECT uid success, result relationshipUid:  {1 1 2 matched relationship}
+Info:2018/02/23 10:52:27 relationship.go:36: UpdateRelationship SELECT anotherUid success, result relationshipAnotherUid:  {2 2 1 matched relationship}
+Info:2018/02/23 10:52:27 relationship.go:82: CreateRelationshipHandler success, result:  {1 1 2 matched relationship}

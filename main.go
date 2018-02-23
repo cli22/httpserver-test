@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"httpserver-test/controller"
-
 	"github.com/gorilla/mux"
+
+	"httpserver-test/controller"
 )
 
 func main() {
