@@ -14,6 +14,7 @@ func ListUserRelationship(uid int) (relationships []dao.Relationship, err error)
 	}
 
 	log.Info.Println("ListUserRelationship SELECT success, result relationships: ", relationships)
+
 	return
 }
 
@@ -39,133 +40,123 @@ func UpdateRelationship(uid, otherUid int, state string) (relationship dao.Relat
 	log.Info.Println("UpdateRelationship SELECT uid success, result relationship: ", relationship)
 	log.Info.Println("UpdateRelationship SELECT otherUid success, result relationshipTmp: ", relationshipTmp)
 
-	// todo refactor
-	//  func ProcRelationship(*relationship, *relationshipTmp) error {
-	//   	...
-	// 		ProcState(state, relationship.State, relationshipTmp.State) ([]state, error)
-	//
-	//		...
-	// }
+	err = ProcRelationship(state, &relationship, &relationshipTmp, uid, otherUid)
+	if err != nil {
+		log.Warning.Println("UpdateRelationship ProcRelationship error: ", err)
+	}
 
-	//  func ProcState(state, state1, state2) ([]states, error) {
-	// 		if state == like {
-	//			states = ProcLike(state1, state2)
-	//		} else if state == unlike {
-	//			states = ProcUnlike(state1, state2)
-	//		}
-	//  }
-	switch state {
-	case dao.Liked:
-		switch relationship.State {
-		case dao.Liked:
+	log.Info.Println("UpdateRelationship success, result: ", relationship)
 
-		case dao.Disliked:
-			if relationshipTmp.State == dao.Liked {
-				relationship.State = dao.Matched
-				relationshipTmp.State = dao.Matched
+	return
+}
 
-				_, err := dao.Db.Model(&relationship, &relationshipTmp).Column("state").Update()
-				if err != nil {
-					log.Warning.Println("UpdateRelationship UPDATE relationship, relationshipTmp state error: ", err)
-				}
+func ProcRelationship(state string, relationship, relationshipTmp *dao.Relationship, uid, otherUid int) (err error) {
+	// not exists, it's a new relationship
+	if relationship.Uid == 0 {
 
-				log.Info.Println("UpdateRelationship UPDATE relationship,relationshipTmp success, result: ", relationship, relationshipTmp)
-			} else {
-				relationship.State = dao.Liked
+		states := ProcState(state, relationship.State, relationshipTmp.State, false)
 
-				_, err := dao.Db.Model(&relationship).Column("state").Returning("*").Update()
-				if err != nil {
-					log.Warning.Println("UpdateRelationship UPDATE relationship state error: ", err)
-				}
+		relationship = &dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: states[0], Type: "relationship"}
+		relationshipTmp = &dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: states[1], Type: "relationship"}
 
-				log.Info.Println("UpdateRelationship UPDATE relationship success, result: ", relationship)
-			}
-
-		case dao.Matched:
-
-		case dao.Default:
-			if relationship.Uid == 0 {
-				relationship = dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: state, Type: "relationship"}
-				relationshipTmp = dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: dao.Default, Type: "relationship"}
-
-				err = dao.Db.Insert(&relationship, &relationshipTmp)
-				if err != nil {
-					log.Warning.Println("UpdateRelationship INSERT relationship, relationshipTmp error: ", err)
-				}
-
-				log.Info.Println("UpdateRelationship INSERT relationship, relationshipTmp success, result: ", relationship, relationshipTmp)
-			} else {
-				if relationshipTmp.State == dao.Liked {
-					relationship.State = dao.Matched
-					relationshipTmp.State = dao.Matched
-
-					_, err := dao.Db.Model(&relationship, &relationshipTmp).Column("state").Update()
-					if err != nil {
-						log.Warning.Println("UpdateRelationship UPDATE relationship, relationshipTmp state error: ", err)
-					}
-
-					log.Info.Println("UpdateRelationship UPDATE relationship, relationshipTmp state success, result: ", relationship, relationshipTmp)
-				} else {
-					relationship.State = dao.Liked
-
-					_, err := dao.Db.Model(&relationship).Column("state").Returning("*").Update()
-					if err != nil {
-						log.Warning.Println("UpdateRelationship UPDATE relationship state error: ", err)
-					}
-
-					log.Info.Println("UpdateRelationship UPDATE relationship state success, result: ", relationship)
-				}
-
-			}
+		err = dao.Db.Insert(relationship, relationshipTmp)
+		if err != nil {
+			log.Warning.Println("UpdateRelationship INSERT relationship, relationshipTmp error: ", err)
 		}
+
+		log.Info.Println("UpdateRelationship INSERT relationship, relationshipTmp success, result: ", relationship, relationshipTmp)
+
+	} else {
+		states := ProcState(state, relationship.State, relationshipTmp.State, true)
+
+		relationship.State = states[0]
+		relationshipTmp.State = states[1]
+
+		_, err := dao.Db.Model(relationship, relationshipTmp).Column("state").Update()
+		if err != nil {
+			log.Warning.Println("UpdateRelationship UPDATE relationship,relationshipTmp state error: ", err)
+		}
+
+		log.Info.Println("UpdateRelationship UPDATE relationship, relationshipTmp state success, result: ", relationship, relationshipTmp)
+
+	}
+
+	return
+}
+
+func ProcState(state, state1, state2 string, exists bool) (states [2]string) {
+	if state == dao.Liked {
+		states = ProcLiked(state1, state2, exists)
+	} else {
+		states = ProcDisliked(state1, state2, exists)
+	}
+
+	log.Info.Println("ProcState success, result: ", states)
+
+	return
+}
+
+func ProcLiked(state1, state2 string, exists bool) (states [2]string) {
+	switch state1 {
+	case dao.Liked:
+		states[0] = state1
+		states[1] = state2
 
 	case dao.Disliked:
-		switch relationship.State {
-		case dao.Liked:
-			relationship.State = dao.Disliked
-
-			_, err := dao.Db.Model(&relationship).Column("state").Returning("*").Update()
-			if err != nil {
-				log.Warning.Println("UpdateRelationship UPDATE relationship state error: ", err)
-			}
-
-			log.Info.Println("UpdateRelationship UPDATE relationship success, result: ", relationship)
-
-		case dao.Disliked:
-
-		case dao.Matched:
-			relationship.State = dao.Disliked
-			relationshipTmp.State = dao.Liked
-
-			_, err := dao.Db.Model(&relationship, &relationshipTmp).Column("state").Update()
-			if err != nil {
-				log.Warning.Println("UpdateRelationship UPDATE relationship,relationshipTmp state error: ", err)
-			}
-
-			log.Info.Println("UpdateRelationship UPDATE relationship, relationshipTmp state success, result: ", relationship, relationshipTmp)
-
-		case dao.Default:
-			if relationship.Uid == 0 {
-				relationship = dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: state, Type: "relationship"}
-				relationshipTmp = dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: dao.Default, Type: "relationship"}
-
-				err = dao.Db.Insert(&relationship, &relationshipTmp)
-				if err != nil {
-					log.Warning.Println("UpdateRelationship INSERT relationship, relationshipTmp error: ", err)
-				}
-
-				log.Info.Println("UpdateRelationship INSERT relationship, relationshipTmp success, result: ", relationship, relationshipTmp)
-			} else {
-				relationship.State = dao.Disliked
-
-				_, err := dao.Db.Model(&relationship).Column("state").Returning("*").Update()
-				if err != nil {
-					log.Warning.Println("UpdateRelationship UPDATE relationship state error: ", err)
-				}
-
-				log.Info.Println("UpdateRelationship UPDATE relationship state success, result: ", relationship)
-			}
+		if state2 == dao.Liked {
+			states[0] = dao.Matched
+			states[1] = dao.Matched
+		} else {
+			states[0] = dao.Liked
+			states[1] = state2
 		}
+
+	case dao.Matched:
+		states[0] = state1
+		states[1] = state2
+
+	case dao.Default:
+		if exists {
+			if state2 == dao.Liked {
+				states[0] = dao.Matched
+				states[1] = dao.Matched
+			} else {
+				states[0] = dao.Liked
+				states[1] = state2
+			}
+		} else {
+			states[0] = dao.Liked
+			states[1] = dao.Default
+		}
+
+	}
+
+	return
+}
+
+func ProcDisliked(state1, state2 string, exists bool) (states [2]string) {
+	switch state1 {
+	case dao.Liked:
+		states[0] = dao.Disliked
+		states[1] = state2
+
+	case dao.Disliked:
+		states[0] = state1
+		states[1] = state2
+
+	case dao.Matched:
+		states[0] = dao.Disliked
+		states[1] = dao.Liked
+
+	case dao.Default:
+		if exists {
+			states[0] = dao.Disliked
+			states[1] = state2
+		} else {
+			states[0] = dao.Disliked
+			states[1] = dao.Default
+		}
+
 	}
 
 	return

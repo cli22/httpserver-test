@@ -18,7 +18,7 @@ func TestListUserRelationship(t *testing.T) {
 	for _, relation := range relations {
 		v, _ := ListUserRelationship(relation.uid)
 		for i, vi := range v {
-			if vi != relation.relationship[i] {
+			if vi.Uid != relation.relationship[i].Uid || vi.OtherUid != relation.relationship[i].OtherUid || vi.State != relation.relationship[i].State {
 				t.Error(
 					"For", relation.uid,
 					"expected", relation.relationship,
@@ -47,7 +47,7 @@ var relationUpdates = []relationUpdateCase{
 func TestUpdateRelationship(t *testing.T) {
 	for _, relation := range relationUpdates {
 		v, _ := UpdateRelationship(relation.uid, relation.otherUid, relation.state)
-		if v != relation.relationship {
+		if v.Uid != relation.relationship.Uid || v.OtherUid != relation.relationship.OtherUid || v.State != relation.relationship.State {
 			t.Error(
 				"For uid", relation.uid,
 				"For otherUid", relation.otherUid,
