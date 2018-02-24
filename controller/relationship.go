@@ -17,7 +17,7 @@ import (
 func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["user_id"]
-	i, err := strconv.Atoi(userId)
+	uid, err := strconv.Atoi(userId)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler Atoi user_id error: ", err)
 		// todo return {"error":errorMsg}
@@ -25,7 +25,15 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := srv.ListUserRelationship(i)
+	// check uid whether exists
+	exist, err := srv.IsUserExist(uid)
+	if !exist {
+		log.Warning.Println("GetRelationshipHandler parameter error: ", error.ErrUidNotExist)
+		http.Error(w, error.ErrUidNotExist.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	res, err := srv.ListUserRelationship(uid)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler ListUserRelationship error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -56,12 +64,27 @@ func CreateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// todo parameter check user_id, other_user_id
+	// check uid whether exists
+	exist, err := srv.IsUserExist(uid)
+	if !exist {
+		log.Warning.Println("CreateRelationshipHandler parameter error: ", error.ErrUidNotExist)
+		http.Error(w, error.ErrUidNotExist.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// check other_user_id whether exists
 	otherUid := vars["other_user_id"]
 	ouid, err := strconv.Atoi(otherUid)
 	if err != nil {
 		log.Warning.Println("CreateRelationshipHandler Atoi otherUid error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	exist, err = srv.IsUserExist(ouid)
+	if !exist {
+		log.Warning.Println("CreateRelationshipHandler parameter error: ", error.ErrOtherUidNotExist)
+		http.Error(w, error.ErrUidNotExist.Error(), http.StatusInternalServerError)
 		return
 	}
 

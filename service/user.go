@@ -6,8 +6,7 @@ import (
 )
 
 func ListUser() (users []dao.User, err error) {
-	err = dao.Db.Model(&users).Order("id").Select()
-	//err = dao.Db.Model(&users).OrderExpr("user.id ASC").Select()
+	err = dao.Db.Model(&users).Order("id ASC").Select()
 	if err != nil {
 		log.Warning.Println("ListUser SELECT error: ", err)
 	}
@@ -27,4 +26,20 @@ func CreateUser(name string) (user *dao.User, err error) {
 	}
 
 	return
+}
+
+func IsUserExist(uid int) (exist bool, err error) {
+	count, err := dao.Db.Model(&dao.User{}).Where("id=?", uid).Count()
+	if err != nil {
+		log.Warning.Println("IsUserExists SELECT id error: ", err)
+	}
+
+	if count > 0 {
+		exist = true
+	} else {
+		exist = false
+	}
+
+	return
+
 }
