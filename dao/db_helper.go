@@ -36,14 +36,14 @@ type User struct {
 }
 
 type Relationship struct {
-	Id         int64  `json:"-"`
-	Uid        int64  `json:"-"`
-	AnotherUid int64  `json:"user_id"`
-	State      string `json:"state"`
-	Type       string `json:"type"`
+	Id       int64  `json:"-"`
+	Uid      int64  `json:"-"`
+	OtherUid int64  `json:"user_id"`
+	State    string `json:"state"`
+	Type     string `json:"type"`
 }
 
-type RelationshipState string
+type RelationshipState = string //typedef
 
 const (
 	Liked    RelationshipState = "liked"

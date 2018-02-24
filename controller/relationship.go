@@ -24,19 +24,23 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	res, err := srv.ListUserRelationship(i)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler ListUserRelationship error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler Marshal error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	log.Info.Println("GetRelationshipHandler ListUserRelationship success, result: ", res)
+
 	// Todo interceptor
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonBytes)
@@ -51,6 +55,8 @@ func CreateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// todo parameter check user_id, other_user_id
 	otherUid := vars["other_user_id"]
 	ouid, err := strconv.Atoi(otherUid)
 	if err != nil {
@@ -58,7 +64,7 @@ func CreateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// todo parameter check user_id, other_user_id
+
 	var input map[string]interface{}
 	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &input)
@@ -67,26 +73,32 @@ func CreateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	state := input["state"].(string)
-	if state != string(dao.Liked) && state != string(dao.Disliked) {
+	if state != dao.Liked && state != dao.Disliked {
 		log.Warning.Println("CreateRelationshipHandler error: ", error.ErrStateInvalid)
 		http.Error(w, error.ErrStateInvalid.Error(), http.StatusBadRequest)
 		return
 	}
+
 	log.Info.Println("CreateRelationshipHandler parameter", uid, ouid, state)
+
 	res, err := srv.UpdateRelationship(uid, ouid, state)
 	if err != nil {
 		log.Warning.Println("CreateRelationshipHandler UpdateRelationship error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	log.Info.Println("CreateRelationshipHandler success, result: ", res)
+
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
 		log.Warning.Println("CreateRelationshipHandler Unmarshal result error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	// Todo interceptor
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonBytes)
