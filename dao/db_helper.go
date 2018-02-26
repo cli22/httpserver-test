@@ -51,3 +51,15 @@ const (
 	Matched  RelationshipState = "matched"
 	Default  RelationshipState = ""
 )
+
+type UserTypeGroup = string
+
+const (
+	UserType UserTypeGroup = "user"
+)
+
+type RelationshipTypeGroup = string
+
+const (
+	RelationshipType RelationshipTypeGroup = "relationship"
+)

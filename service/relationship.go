@@ -7,13 +7,13 @@ import (
 	"httpserver-test/log"
 )
 
-func ListUserRelationship(uid int) (relationships []dao.Relationship, err error) {
+func GetUserRelationship(uid int) (relationships []dao.Relationship, err error) {
 	err = dao.Db.Model(&relationships).Where("relationship.uid=?", uid).OrderExpr("relationship.other_uid ASC").Select()
 	if err != nil {
-		log.Warning.Println("ListUserRelationship SELECT error: ", err)
+		log.Warning.Println("GetUserRelationship SELECT error: ", err)
 	}
 
-	log.Info.Println("ListUserRelationship SELECT success, result relationships: ", relationships)
+	log.Info.Println("GetUserRelationship SELECT success, result relationships: ", relationships)
 
 	return
 }
@@ -56,8 +56,8 @@ func ProcRelationship(state string, relationship, relationshipTmp *dao.Relations
 
 		states := ProcState(state, relationship.State, relationshipTmp.State, false)
 
-		relationship = &dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: states[0], Type: "relationship"}
-		relationshipTmp = &dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: states[1], Type: "relationship"}
+		relationship = &dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: states[0], Type: dao.RelationshipType}
+		relationshipTmp = &dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: states[1], Type: dao.RelationshipType}
 
 		err = dao.Db.Insert(relationship, relationshipTmp)
 		if err != nil {
@@ -84,7 +84,7 @@ func ProcRelationship(state string, relationship, relationshipTmp *dao.Relations
 	return
 }
 
-func ProcState(state, state1, state2 string, exists bool) (states [2]string) {
+func ProcState(state, state1, state2 string, exists bool) (states []string) {
 	if state == dao.Liked {
 		states = ProcLiked(state1, state2, exists)
 	} else {
@@ -96,11 +96,11 @@ func ProcState(state, state1, state2 string, exists bool) (states [2]string) {
 	return
 }
 
-func ProcLiked(state1, state2 string, exists bool) (states [2]string) {
+func ProcLiked(state1, state2 string, exists bool) (states []string) {
+	states = []string{state1, state2}
+
 	switch state1 {
 	case dao.Liked:
-		states[0] = state1
-		states[1] = state2
 
 	case dao.Disliked:
 		if state2 == dao.Liked {
@@ -108,12 +108,9 @@ func ProcLiked(state1, state2 string, exists bool) (states [2]string) {
 			states[1] = dao.Matched
 		} else {
 			states[0] = dao.Liked
-			states[1] = state2
 		}
 
 	case dao.Matched:
-		states[0] = state1
-		states[1] = state2
 
 	case dao.Default:
 		if exists {
@@ -122,7 +119,6 @@ func ProcLiked(state1, state2 string, exists bool) (states [2]string) {
 				states[1] = dao.Matched
 			} else {
 				states[0] = dao.Liked
-				states[1] = state2
 			}
 		} else {
 			states[0] = dao.Liked
@@ -134,15 +130,14 @@ func ProcLiked(state1, state2 string, exists bool) (states [2]string) {
 	return
 }
 
-func ProcDisliked(state1, state2 string, exists bool) (states [2]string) {
+func ProcDisliked(state1, state2 string, exists bool) (states []string) {
+	states = []string{state1, state2}
+
 	switch state1 {
 	case dao.Liked:
 		states[0] = dao.Disliked
-		states[1] = state2
 
 	case dao.Disliked:
-		states[0] = state1
-		states[1] = state2
 
 	case dao.Matched:
 		states[0] = dao.Disliked
@@ -151,7 +146,6 @@ func ProcDisliked(state1, state2 string, exists bool) (states [2]string) {
 	case dao.Default:
 		if exists {
 			states[0] = dao.Disliked
-			states[1] = state2
 		} else {
 			states[0] = dao.Disliked
 			states[1] = dao.Default

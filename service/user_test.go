@@ -11,8 +11,8 @@ type userCase struct {
 }
 
 var users = []userCase{
-	{"Alice", &dao.User{Id: 1, Name: "Alice", Type: "user"}},
-	{"Tom", &dao.User{Id: 2, Name: "Tom", Type: "user"}},
+	{"Alice", &dao.User{Id: 1, Name: "Alice", Type: dao.UserType}},
+	{"Tom", &dao.User{Id: 2, Name: "Tom", Type: dao.UserType}},
 }
 
 func TestCreateUser(t *testing.T) {

@@ -43,6 +43,12 @@
 			"path": "github.com/gorilla/mux",
 			"revision": "c0091a029979286890368b4c7b301261e448e242",
 			"revisionTime": "2018-01-20T07:58:19Z"
+		},
+		{
+			"checksumSHA1": "j8Qs+yfgwYYOtodB/1bSlbzV5rs=",
+			"path": "google.golang.org/grpc/codes",
+			"revision": "445b7284b13dacfc46e84a6d4ac38e2693d776ff",
+			"revisionTime": "2018-02-14T00:48:27Z"
 		}
 	],
 	"rootPath": "httpserver-test"
