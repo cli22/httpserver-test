@@ -5,7 +5,7 @@ import (
 	"httpserver-test/dao"
 )
 
-// when relationship changed, this testcase cannot work
+// Todo when relationship changed, this test case cannot work
 //type relationListCase struct {
 //	uid          int
 //	relationship []dao.Relationship
