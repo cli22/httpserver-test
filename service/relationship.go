@@ -50,20 +50,19 @@ func UpdateRelationship(uid, otherUid int, state string) (relationship dao.Relat
 	return
 }
 
-func ProcRelationship(state string, relationship, relationshipTmp *dao.Relationship, uid, otherUid int) (err error) {
+func ProcRelationship(state string, relationship *dao.Relationship, relationshipTmp *dao.Relationship, uid, otherUid int) (err error) {
 	// not exists, it's a new relationship
 	if relationship.Uid == 0 {
 
 		states := ProcState(state, relationship.State, relationshipTmp.State, false)
 
-		relationship = &dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: states[0], Type: dao.RelationshipType}
-		relationshipTmp = &dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: states[1], Type: dao.RelationshipType}
+		*relationship = dao.Relationship{Uid: int64(uid), OtherUid: int64(otherUid), State: states[0], Type: dao.RelationshipType}
+		*relationshipTmp = dao.Relationship{Uid: int64(otherUid), OtherUid: int64(uid), State: states[1], Type: dao.RelationshipType}
 
 		err = dao.Db.Insert(relationship, relationshipTmp)
 		if err != nil {
 			log.Warning.Println("UpdateRelationship INSERT relationship, relationshipTmp error: ", err)
 		}
-
 		log.Info.Println("UpdateRelationship INSERT relationship, relationshipTmp success, result: ", relationship, relationshipTmp)
 
 	} else {
