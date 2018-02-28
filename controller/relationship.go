@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc/codes"
 
 	srv "httpserver-test/service"
 	"httpserver-test/dao"
@@ -15,7 +16,7 @@ import (
 )
 
 type response struct {
-	Errno  int         `json:"errno"`
+	Errno  codes.Code  `json:"errno"`
 	Errmsg string      `json:"errmsg"`
 	Data   interface{} `json:"data"`
 }
@@ -31,7 +32,7 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	uid, err := strconv.Atoi(userId)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler Atoi user_id error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrGetRelationship), Errmsg: error.Msg[error.ErrGetRelationship],})
+		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
 		return
 	}
 
@@ -39,26 +40,26 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	exist, err := srv.IsUserExist(uid)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler IsUserExist user_id error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrGetRelationship), Errmsg: error.Msg[error.ErrGetRelationship],})
+		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
 		return
 	}
 
 	if !exist {
 		log.Warning.Println("GetRelationshipHandler parameter error: ", error.Msg[error.ErrUidNotExist])
-		writeResponse(w, response{Errno: int(error.ErrUidNotExist), Errmsg: error.Msg[error.ErrUidNotExist],})
+		writeResponse(w, response{Errno: error.ErrUidNotExist, Errmsg: error.Msg[error.ErrUidNotExist],})
 		return
 	}
 
 	res, err := srv.GetUserRelationship(uid)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler GetUserRelationship error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrGetRelationship), Errmsg: error.Msg[error.ErrGetRelationship],})
+		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
 		return
 	}
 
 	log.Info.Println("GetRelationshipHandler ListUserRelationship success, result: ", res)
 
-	writeResponse(w, response{Errno: int(error.ErrOk), Errmsg: error.Msg[error.ErrOk], Data: res})
+	writeResponse(w, response{Errno: error.ErrOk, Errmsg: error.Msg[error.ErrOk], Data: res})
 }
 
 func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +68,7 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	uid, err := strconv.Atoi(userId)
 	if err != nil {
 		log.Warning.Println("UpdateRelationshipHandler Atoi user_id error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrPutRelationship), Errmsg: error.Msg[error.ErrPutRelationship],})
+		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
 		return
 	}
 
@@ -75,13 +76,13 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	exist, err := srv.IsUserExist(uid)
 	if err != nil {
 		log.Warning.Println("UpdateRelationshipHandler IsUserExist user_id error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrPutRelationship), Errmsg: error.Msg[error.ErrPutRelationship],})
+		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
 		return
 	}
 
 	if !exist {
 		log.Warning.Println("UpdateRelationshipHandler parameter error: ", error.Msg[error.ErrUidNotExist])
-		writeResponse(w, response{Errno: int(error.ErrUidNotExist), Errmsg: error.Msg[error.ErrUidNotExist],})
+		writeResponse(w, response{Errno: error.ErrUidNotExist, Errmsg: error.Msg[error.ErrUidNotExist],})
 		return
 	}
 
@@ -90,20 +91,20 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	ouid, err := strconv.Atoi(otherUid)
 	if err != nil {
 		log.Warning.Println("UpdateRelationshipHandler Atoi otherUid error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrPutRelationship), Errmsg: error.Msg[error.ErrPutRelationship],})
+		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
 		return
 	}
 
 	exist, err = srv.IsUserExist(ouid)
 	if err != nil {
 		log.Warning.Println("UpdateRelationshipHandler IsUserExist other_user_id error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrPutRelationship), Errmsg: error.Msg[error.ErrPutRelationship],})
+		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
 		return
 	}
 
 	if !exist {
 		log.Warning.Println("UpdateRelationshipHandler parameter error: ", error.Msg[error.ErrOtherUidNotExist])
-		writeResponse(w, response{Errno: int(error.ErrOtherUidNotExist), Errmsg: error.Msg[error.ErrOtherUidNotExist],})
+		writeResponse(w, response{Errno: error.ErrOtherUidNotExist, Errmsg: error.Msg[error.ErrOtherUidNotExist],})
 		return
 	}
 
@@ -112,14 +113,14 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &input)
 	if err != nil {
 		log.Warning.Println("UpdateRelationshipHandler Unmarshal input error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrPutRelationship), Errmsg: error.Msg[error.ErrPutRelationship],})
+		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
 		return
 	}
 
 	state := input["state"].(string)
 	if state != dao.Liked && state != dao.Disliked {
 		log.Warning.Println("UpdateRelationshipHandler error: ", error.Msg[error.ErrStateInvalid])
-		writeResponse(w, response{Errno: int(error.ErrStateInvalid), Errmsg: error.Msg[error.ErrStateInvalid],})
+		writeResponse(w, response{Errno: error.ErrStateInvalid, Errmsg: error.Msg[error.ErrStateInvalid],})
 		return
 	}
 
@@ -128,11 +129,11 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := srv.UpdateRelationship(uid, ouid, state)
 	if err != nil {
 		log.Warning.Println("UpdateRelationshipHandler UpdateRelationship error: ", err)
-		writeResponse(w, response{Errno: int(error.ErrPutRelationship), Errmsg: error.Msg[error.ErrPutRelationship],})
+		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
 		return
 	}
 
 	log.Info.Println("UpdateRelationshipHandler success, result: ", res)
 
-	writeResponse(w, response{int(error.ErrOk), error.Msg[error.ErrOk], res})
+	writeResponse(w, response{error.ErrOk, error.Msg[error.ErrOk], res})
 }
