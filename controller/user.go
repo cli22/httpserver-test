@@ -26,8 +26,8 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	// todo name need to be unique?
 	var input map[string]interface{}
-	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warning.Println("UserHandler ReadAll Body error: ", err)
 		writeResponse(w, response{error.ErrCreateUser, error.Msg[error.ErrCreateUser], ""})
