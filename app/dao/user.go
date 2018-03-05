@@ -55,7 +55,7 @@ func (this *MyUser) List() (users []*entity.User, err error) {
 	return users, err
 }
 
-func (this *MyUser) Add(data *entity.User) (user []*entity.User, err error) {
+func (this *MyUser) Add(data *entity.User) (user *entity.User, err error) {
 	daoUser := &User{
 		Name: data.Name,
 		Type: UserType,
@@ -68,7 +68,11 @@ func (this *MyUser) Add(data *entity.User) (user []*entity.User, err error) {
 
 	res := make([]*User, 0)
 	res = append(res, daoUser)
-	user, err = this.resToUser(res)
+	users, err := this.resToUser(res)
+
+	if len(users) == 1 {
+		user = users[0]
+	}
 
 	return user, err
 }

@@ -1,12 +1,12 @@
 [server]
-port = ":8080"
+port = 8080
 
 [log]
 filename = "httpserver.log"
 
-[database]
+[postgres]
 ip = "127.0.0.1"
-port = "3306"
+port = 3306
 user = "postgres"
 pwd = "123"
 dbname = "test"

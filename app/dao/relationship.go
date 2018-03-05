@@ -43,7 +43,9 @@ func (this *MyRelationship) resToRelationship(res []*Relationship) (relationship
 
 	for _, r := range res {
 		relationship := new(entity.Relationship)
-		relationship.OtherUid = strconv.Itoa(r.Id)
+		relationship.Id = r.Id
+		relationship.Uid = strconv.Itoa(r.Uid)
+		relationship.OtherUid = strconv.Itoa(r.OtherUid)
 		relationship.State = r.State
 		relationship.Type = r.Type
 
@@ -69,14 +71,18 @@ func (this *MyRelationship) GetByUid(data *entity.Relationship) (relationships [
 }
 
 func (this *MyRelationship) GetByUidOtherUid(data *entity.Relationship) (relationship *entity.Relationship, err error) {
-	res := make([]*Relationship, 0)
+	daoRelationship := &Relationship{}
 
-	err = Db.Model(&res).Where("relationship.uid=?", data.Uid).OrderExpr("relationship.other_uid ASC").Select()
+	err = Db.Model(daoRelationship).Where("relationship.uid=?", data.Uid).Where("relationship.other_uid=?", data.OtherUid).Select()
+
 	if err != nil {
 		log.Warning.Println("SELECT error: ", err)
 	}
 
+	res := make([]*Relationship, 0)
+	res = append(res, daoRelationship)
 	relationships, err := this.resToRelationship(res)
+
 	if len(relationships) == 1 {
 		relationship = relationships[0]
 	}
@@ -88,8 +94,9 @@ func (this *MyRelationship) GetByUidOtherUid(data *entity.Relationship) (relatio
 
 func (this *MyRelationship) UpdateRelationshipByState(data *entity.Relationship) (relationship *entity.Relationship, err error) {
 	daoRelationship := &Relationship{}
+	daoRelationship.State = data.State
 
-	_, err = Db.Model(&daoRelationship).Where("relationship.uid=?", data.Uid).Where("relationship.other_uid=?", data.OtherUid).Column("state").Update()
+	_, err = Db.Model(daoRelationship).Where("relationship.uid=?", data.Uid).Where("relationship.other_uid=?", data.OtherUid).Column("state").Update()
 	if err != nil {
 		log.Warning.Println("Update error: ", err)
 	}
@@ -102,7 +109,7 @@ func (this *MyRelationship) UpdateRelationshipByState(data *entity.Relationship)
 		relationship = relationships[0]
 	}
 
-	log.Info.Println("Update result: ", relationship)
+	log.Info.Println("Update result: ")
 
 	return
 }

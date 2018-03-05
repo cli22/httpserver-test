@@ -3,25 +3,28 @@ package service
 import (
 	"testing"
 	"httpserver-test/app/dao"
+	"httpserver-test/app/entity"
 )
 
 type userCase struct {
-	name string
-	user *dao.User
+	name   string
+	expect *entity.User
 }
 
 var users = []userCase{
-	{"Alice", &dao.User{Id: 1, Name: "Alice", Type: dao.UserType}},
-	{"Tom", &dao.User{Id: 2, Name: "Tom", Type: dao.UserType}},
+	{"Alice", &entity.User{Name: "Alice", Type: dao.UserType}},
+	{"Tom", &entity.User{Name: "Tom", Type: dao.UserType}},
 }
 
-func TestCreateUser(t *testing.T) {
+func TestUser_CreateUser(t *testing.T) {
+	daoUser := dao.NewMyUser()
 	for _, user := range users {
-		v, _ := CreateUser(user.name)
-		if v.Name != user.user.Name || v.Type != user.user.Type {
+		inputUser := &entity.User{Name: user.name}
+		v, _ := daoUser.Add(inputUser)
+		if v.Name != user.expect.Name || v.Type != user.expect.Type {
 			t.Error(
 				"For", user.name,
-				"expected", user.user,
+				"expected", user.expect,
 				"got", v,
 			)
 		}

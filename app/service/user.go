@@ -2,8 +2,8 @@ package service
 
 import (
 	"httpserver-test/app/dao"
-	"httpserver-test/log"
 	"httpserver-test/app/entity"
+	"httpserver-test/log"
 )
 
 var User_svc *User
@@ -27,8 +27,8 @@ func (u *User) GetUser() (users []*entity.User, err error) {
 	return
 }
 
-func (u *User) CreateUser(data *entity.User) (users []*entity.User, err error) {
-	users, err = u.my_dao_user.Add(data)
+func (u *User) CreateUser(data *entity.User) (user *entity.User, err error) {
+	user, err = u.my_dao_user.Add(data)
 	if err != nil {
 		log.Warning.Println("CreateUser error: ", err)
 	}
