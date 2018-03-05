@@ -2,7 +2,7 @@ package service
 
 import (
 	"testing"
-	"httpserver-test/dao"
+	"httpserver-test/app/dao"
 )
 
 type userCase struct {
