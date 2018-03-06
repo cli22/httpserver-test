@@ -46,8 +46,9 @@ func Start() {
 	router.HandleFunc("/users/{user_id:[0-9]+}/relationships", controller.GetRelationshipHandler).Methods("GET")
 	router.HandleFunc("/users/{user_id:[0-9]+}/relationships/{other_user_id:[0-9]+}", controller.UpdateRelationshipHandler).Methods("PUT")
 
-	mw := controller.Middleware{}
-	router.Use(mw.MiddlewareFunc)
+	//mw := controller.Middleware{}
+	controller.Mw = controller.NewMw()
+	router.Use(controller.Mw.MiddlewareFunc)
 
-	slog.Error.Println(http.ListenAndServe(":8080", router))
+	slog.Error.Println(http.ListenAndServe(config.Conf.Server.Port, router))
 }

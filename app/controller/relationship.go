@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc/codes"
@@ -97,13 +96,7 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var input map[string]interface{}
-	// todo change to decode
-	defer r.Body.Close()
-	body, _ := ioutil.ReadAll(r.Body)
-	_ = json.Unmarshal(body, &input)
-
-	state := input["state"].(string)
+	state := Mw.input["state"].(string)
 	if state != dao.Liked && state != dao.Disliked {
 		log.Warning.Println("UpdateRelationshipHandler error: ", error.Msg[error.ErrStateInvalid])
 		writeResponse(w, response{Errno: error.ErrStateInvalid, Errmsg: error.Msg[error.ErrStateInvalid],})

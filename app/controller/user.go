@@ -11,17 +11,25 @@ import (
 	"httpserver-test/app/entity"
 )
 
+var Mw *Middleware
+
 type Middleware struct {
 	input map[string]interface{}
 }
 
+func NewMw() *Middleware {
+	return new(Middleware)
+}
+
+// for put and post method, unmarshal body content for controller handle use.
+// todo add parameter check for user_id and other_user_id
 func (mw *Middleware) MiddlewareFunc(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" || r.Method == "PUT" {
 			defer r.Body.Close()
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
-				log.Warning.Println("UserHandler error: ", err)
+				log.Warning.Println("MiddlewareFunc error: ", err)
 				writeResponse(w, response{Errno: error.ErrCreateUser, Errmsg: error.Msg[error.ErrCreateUser]})
 				return
 			}
@@ -29,7 +37,7 @@ func (mw *Middleware) MiddlewareFunc(next http.Handler) http.Handler {
 			//todo
 			err = json.Unmarshal(body, &mw.input)
 			if err != nil {
-				log.Warning.Println("UserHandler error: ", err)
+				log.Warning.Println("MiddlewareFunc error: ", err)
 				writeResponse(w, response{Errno: error.ErrCreateUser, Errmsg: error.Msg[error.ErrCreateUser]})
 				return
 			}
@@ -54,14 +62,7 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	var input map[string]interface{}
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-
-	//todo
-	_ = json.Unmarshal(body, &input)
-
-	name := input["name"].(string)
+	name := Mw.input["name"].(string)
 	if name == "" {
 		log.Warning.Println("UserHandler error: ", error.Msg[error.ErrNameEmpty])
 		writeResponse(w, response{Errno: error.ErrNameEmpty, Errmsg: error.Msg[error.ErrNameEmpty]})

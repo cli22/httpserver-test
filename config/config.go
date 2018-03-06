@@ -15,12 +15,12 @@ type Config struct {
 }
 
 type Server struct {
-	Port int `default:"8080"`
+	Port string `default:"8080"`
 }
 
 type Postgres struct {
 	Ip     string `default:"127.0.0.1"`
-	Port   int `default:"3306"`
+	Port   int    `default:"3306"`
 	User   string
 	Pwd    string
 	Dbname string

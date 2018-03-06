@@ -43,7 +43,6 @@ func (this *MyRelationship) resToRelationship(res []*Relationship) (relationship
 
 	for _, r := range res {
 		relationship := new(entity.Relationship)
-		relationship.Id = r.Id
 		relationship.Uid = strconv.Itoa(r.Uid)
 		relationship.OtherUid = strconv.Itoa(r.OtherUid)
 		relationship.State = r.State
