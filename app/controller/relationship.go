@@ -101,12 +101,7 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	// todo change to decode
 	defer r.Body.Close()
 	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &input)
-	if err != nil {
-		log.Warning.Println("UpdateRelationshipHandler error: ", err)
-		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})
-		return
-	}
+	_ = json.Unmarshal(body, &input)
 
 	state := input["state"].(string)
 	if state != dao.Liked && state != dao.Disliked {
