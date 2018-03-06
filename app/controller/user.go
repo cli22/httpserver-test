@@ -8,7 +8,7 @@ import (
 	"github.com/httpserver-test/app/entity"
 	"github.com/httpserver-test/app/error"
 	"github.com/httpserver-test/log"
-	srv "httpserver-test/app/service"
+	srv "github.com/httpserver-test/app/service"
 )
 
 var Mw *Middleware
