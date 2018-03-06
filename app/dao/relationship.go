@@ -57,7 +57,7 @@ func (this *MyRelationship) resToRelationship(res []*Relationship) (relationship
 func (this *MyRelationship) GetByUid(data *entity.Relationship) (relationships []*entity.Relationship, err error) {
 	res := make([]*Relationship, 0)
 
-	err = Db.Model(&res).Where("relationship.uid=?", data.Uid).Select()
+	err = Db.Model(&res).Where("relationship.uid=?", data.Uid).Order("relationship.other_uid").Select()
 	if err != nil {
 		log.Warning.Println("SELECT error: ", err)
 	}

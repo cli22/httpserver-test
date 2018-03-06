@@ -48,7 +48,7 @@ func (mw *Middleware) MiddlewareFunc(next http.Handler) http.Handler {
 }
 
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := srv.User_svc.GetUser()
+	res, err := srv.UserSvc.GetUser()
 
 	if err != nil {
 		log.Warning.Println("UserHandler GetUser error: ", err)
@@ -72,7 +72,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := new(entity.User)
 	user.Name = name
 
-	res, err := srv.User_svc.CreateUser(user)
+	res, err := srv.UserSvc.CreateUser(user)
 	if err != nil {
 		log.Warning.Println("CreateUser error: ", err)
 		writeResponse(w, response{Errno: error.ErrCreateUser, Errmsg: error.Msg[error.ErrCreateUser]})

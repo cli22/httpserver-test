@@ -8,20 +8,20 @@ import (
 	"httpserver-test/log"
 )
 
-var Relationship_svc *Relationship
+var RelationshipSvc *Relationship
 
 type Relationship struct {
-	my_dao_relationship *dao.MyRelationship
+	myDaoRelationship *dao.MyRelationship
 }
 
 func NewRelationship() *Relationship {
 	relationship := new(Relationship)
-	relationship.my_dao_relationship = dao.NewMyRelationship()
+	relationship.myDaoRelationship = dao.NewMyRelationship()
 	return relationship
 }
 
 func (r *Relationship) GetUserRelationship(data *entity.Relationship) (relationships []*entity.Relationship, err error) {
-	relationships, err = r.my_dao_relationship.GetByUid(data)
+	relationships, err = r.myDaoRelationship.GetByUid(data)
 	if err != nil {
 		log.Warning.Println("GetUserRelationship error: ", err)
 	}
@@ -36,7 +36,7 @@ func (r *Relationship) UpdateRelationship(data *entity.Relationship) (relationsh
 	mu.Lock()
 	defer mu.Unlock()
 
-	relationship, err = r.my_dao_relationship.GetByUidOtherUid(data)
+	relationship, err = r.myDaoRelationship.GetByUidOtherUid(data)
 
 	if err != nil {
 		log.Warning.Println("SELECT uid error: ", err)
@@ -46,7 +46,7 @@ func (r *Relationship) UpdateRelationship(data *entity.Relationship) (relationsh
 	relationshipTmp.Uid = data.OtherUid
 	relationshipTmp.OtherUid = data.Uid
 
-	relationshipTmp, err = r.my_dao_relationship.GetByUidOtherUid(relationshipTmp)
+	relationshipTmp, err = r.myDaoRelationship.GetByUidOtherUid(relationshipTmp)
 
 	if err != nil {
 		log.Warning.Println("SELECT other_uid error: ", err)
@@ -73,7 +73,7 @@ func (r *Relationship) ProcRelationship(data, relationship, relationshipTmp *ent
 		relationship.Uid = data.Uid
 		relationship.OtherUid = data.OtherUid
 
-		relationship, err = r.my_dao_relationship.Add(relationship)
+		relationship, err = r.myDaoRelationship.Add(relationship)
 		if err != nil {
 			log.Warning.Println("INSERT relationship error: ", err)
 		}
@@ -81,7 +81,7 @@ func (r *Relationship) ProcRelationship(data, relationship, relationshipTmp *ent
 		relationshipTmp.State = dao.Default
 		relationshipTmp.Uid = data.OtherUid
 		relationshipTmp.OtherUid = data.Uid
-		relationship, err = r.my_dao_relationship.Add(relationshipTmp)
+		relationship, err = r.myDaoRelationship.Add(relationshipTmp)
 		if err != nil {
 			log.Warning.Println("INSERT relationshipTmp error: ", err)
 		}
@@ -96,12 +96,12 @@ func (r *Relationship) ProcRelationship(data, relationship, relationshipTmp *ent
 		relationship.State = states[0]
 		relationshipTmp.State = states[1]
 
-		relationship, err = r.my_dao_relationship.UpdateRelationshipByState(relationship)
+		relationship, err = r.myDaoRelationship.UpdateRelationshipByState(relationship)
 		if err != nil {
 			log.Warning.Println("UPDATE relationship error: ", err)
 		}
 
-		relationshipTmp, err = r.my_dao_relationship.UpdateRelationshipByState(relationshipTmp)
+		relationshipTmp, err = r.myDaoRelationship.UpdateRelationshipByState(relationshipTmp)
 		if err != nil {
 			log.Warning.Println("UPDATE relationshipTmp error: ", err)
 		}

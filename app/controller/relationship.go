@@ -31,7 +31,7 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	user := new(entity.User)
 	user.Id = vars["user_id"]
 
-	exist, err := srv.User_svc.IsUserExist(user)
+	exist, err := srv.UserSvc.IsUserExist(user)
 	if err != nil {
 		log.Warning.Println("GetRelationshipHandler IsUserExist error: ", err)
 		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
@@ -47,7 +47,7 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	relationship := new(entity.Relationship)
 	relationship.Uid = user.Id
 
-	res, err := srv.Relationship_svc.GetUserRelationship(relationship)
+	res, err := srv.RelationshipSvc.GetUserRelationship(relationship)
 	if err != nil {
 		log.Warning.Println("GetUserRelationship error: ", err)
 		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
@@ -62,13 +62,13 @@ func GetRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uid := vars["user_id"]
-	other_uid := vars["other_user_id"]
+	otherUid := vars["other_user_id"]
 
 	// check uid whether exists
 	user := new(entity.User)
 	user.Id = uid
 
-	exist, err := srv.User_svc.IsUserExist(user)
+	exist, err := srv.UserSvc.IsUserExist(user)
 	if err != nil {
 		log.Warning.Println("IsUserExist uid error: ", err)
 		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
@@ -82,8 +82,8 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check other_user_id whether exists
-	user.Id = other_uid
-	exist, err = srv.User_svc.IsUserExist(user)
+	user.Id = otherUid
+	exist, err = srv.UserSvc.IsUserExist(user)
 	if err != nil {
 		log.Warning.Println("IsUserExist other_uid error: ", err)
 		writeResponse(w, response{Errno: error.ErrGetRelationship, Errmsg: error.Msg[error.ErrGetRelationship],})
@@ -105,12 +105,12 @@ func UpdateRelationshipHandler(w http.ResponseWriter, r *http.Request) {
 
 	relationship := new(entity.Relationship)
 	relationship.Uid = uid
-	relationship.OtherUid = other_uid
+	relationship.OtherUid = otherUid
 	relationship.State = state
 
 	log.Info.Println("UpdateRelationshipHandler parameter", relationship)
 
-	res, err := srv.Relationship_svc.UpdateRelationship(relationship)
+	res, err := srv.RelationshipSvc.UpdateRelationship(relationship)
 	if err != nil {
 		log.Warning.Println("UpdateRelationship error: ", err)
 		writeResponse(w, response{Errno: error.ErrPutRelationship, Errmsg: error.Msg[error.ErrPutRelationship],})

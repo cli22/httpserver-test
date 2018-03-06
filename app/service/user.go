@@ -6,20 +6,20 @@ import (
 	"httpserver-test/log"
 )
 
-var User_svc *User
+var UserSvc *User
 
 type User struct {
-	my_dao_user *dao.MyUser
+	myDaoUser *dao.MyUser
 }
 
 func NewUser() *User {
 	user := new(User)
-	user.my_dao_user = dao.NewMyUser()
+	user.myDaoUser = dao.NewMyUser()
 	return user
 }
 
 func (u *User) GetUser() (users []*entity.User, err error) {
-	users, err = u.my_dao_user.List()
+	users, err = u.myDaoUser.List()
 	if err != nil {
 		log.Warning.Println("GetUser error: ", err)
 	}
@@ -28,7 +28,7 @@ func (u *User) GetUser() (users []*entity.User, err error) {
 }
 
 func (u *User) CreateUser(data *entity.User) (user *entity.User, err error) {
-	user, err = u.my_dao_user.Add(data)
+	user, err = u.myDaoUser.Add(data)
 	if err != nil {
 		log.Warning.Println("CreateUser error: ", err)
 	}
@@ -37,7 +37,7 @@ func (u *User) CreateUser(data *entity.User) (user *entity.User, err error) {
 }
 
 func (u *User) IsUserExist(data *entity.User) (exist bool, err error) {
-	exist, err = u.my_dao_user.IsUserExist(data)
+	exist, err = u.myDaoUser.IsUserExist(data)
 	if err != nil {
 		log.Warning.Println("IsUserExist error: ", err)
 	}
