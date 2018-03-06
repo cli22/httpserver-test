@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"httpserver-test/config"
+	"github.com/httpserver-test/config"
 )
 
 var (

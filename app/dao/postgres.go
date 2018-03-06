@@ -3,7 +3,7 @@ package dao
 import (
 	"github.com/go-pg/pg"
 
-	"httpserver-test/config"
+	"github.com/httpserver-test/config"
 )
 
 var Db *pg.DB

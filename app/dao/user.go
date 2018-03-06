@@ -3,8 +3,8 @@ package dao
 import (
 	"strconv"
 
-	"httpserver-test/app/entity"
-	"httpserver-test/log"
+	"github.com/httpserver-test/app/entity"
+	"github.com/httpserver-test/log"
 )
 
 type User struct {

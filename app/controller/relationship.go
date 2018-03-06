@@ -6,11 +6,11 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc/codes"
 
-	"httpserver-test/app/dao"
-	"httpserver-test/app/error"
-	"httpserver-test/log"
-	srv "httpserver-test/app/service"
-	"httpserver-test/app/entity"
+	"github.com/httpserver-test/app/dao"
+	"github.com/httpserver-test/app/entity"
+	"github.com/httpserver-test/app/error"
+	"github.com/httpserver-test/log"
+	srv "github.com/httpserver-test/app/service"
 )
 
 type response struct {

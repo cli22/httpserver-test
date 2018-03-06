@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"io/ioutil"
 
-	"httpserver-test/app/error"
-	"httpserver-test/log"
+	"github.com/httpserver-test/app/entity"
+	"github.com/httpserver-test/app/error"
+	"github.com/httpserver-test/log"
 	srv "httpserver-test/app/service"
-	"httpserver-test/app/entity"
 )
 
 var Mw *Middleware

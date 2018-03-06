@@ -1,7 +1,7 @@
 package main
 
 import (
-	"httpserver-test/app"
+	"github.com/httpserver-test/app"
 )
 
 func main() {

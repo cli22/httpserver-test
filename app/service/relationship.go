@@ -3,9 +3,9 @@ package service
 import (
 	"sync"
 
-	"httpserver-test/app/dao"
-	"httpserver-test/app/entity"
-	"httpserver-test/log"
+	"github.com/httpserver-test/app/dao"
+	"github.com/httpserver-test/app/entity"
+	"github.com/httpserver-test/log"
 )
 
 var RelationshipSvc *Relationship

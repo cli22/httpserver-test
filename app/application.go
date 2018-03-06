@@ -7,11 +7,11 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"httpserver-test/app/controller"
-	"httpserver-test/config"
-	"httpserver-test/app/dao"
-	slog "httpserver-test/log"
-	srv "httpserver-test/app/service"
+	"github.com/httpserver-test/app/controller"
+	"github.com/httpserver-test/app/dao"
+	"github.com/httpserver-test/config"
+	slog "github.com/httpserver-test/log"
+	srv "github.com/httpserver-test/app/service"
 )
 
 func initServer() {
